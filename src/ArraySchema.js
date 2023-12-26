@@ -14,4 +14,8 @@ export default class ArraySchema {
       return new ArraySchema([...this.validators, validator]); 
     }
     
+    custom(validFunc){
+        const validator = (array) => array.every(validFunc);
+        return new ArraySchema([...this.validators, validator]);
+      }
   }
