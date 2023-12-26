@@ -1,4 +1,5 @@
 const objLength = (obj) => Object.keys(obj).length;
+const isPlainObject = (obj) => Object.getPrototypeOf(obj) === Object.prototype;
 
 export default class ObjectSchema {
   validatorsObject = null;
@@ -13,6 +14,17 @@ export default class ObjectSchema {
 
   isValid(inspectedObject){
     if (objLength(inspectedObject) !== objLength(this.validatorsObject)) return false;
-    return Object.entries(inspectedObject).every(([key, val]) => this.validatorsObject[key].isValid(val))
+    
+    const validDeepObj = (inspectedObj, validatorsObject) => {
+
+      return Object.entries(inspectedObj).every(([key, val]) => {
+
+        if (!isPlainObject(inspectedObj[key])) return validatorsObject[key].isValid(val);   
+        
+        return validDeepObj(inspectedObj[key], validatorsObject[key])
+        })                   
+      }
+    
+    return validDeepObj(inspectedObject, this.validatorsObject);
   }
 }
